@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/notifications';
+const API_BASE = 'http://localhost:5000';
 const TIMEOUT = 5000;
 
 // Reusable axios instance
 const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE,
   timeout: TIMEOUT,
 });
 
@@ -71,10 +71,10 @@ function normalizeNotifications(response) {
 
   const rawNotifications = Array.isArray(response?.notifications)
     ? response.notifications
-    : Array.isArray(response?.data)
-      ? response.data
-      : Array.isArray(response?.data?.notifications)
-        ? response.data.notifications
+    : Array.isArray(response?.data?.notifications)
+      ? response.data.notifications
+      : Array.isArray(response?.data)
+        ? response.data
         : [];
 
   const normalized = rawNotifications.map((item) => ({
@@ -136,7 +136,7 @@ function paginate(notifications, page = 1, limit = 10) {
 }
 
 async function fetchNotifications() {
-  const response = await api.get('/notifications');
+  const response = await api.get(`${API_BASE}/notifications`);
   return normalizeNotifications(response?.data || response);
 }
 

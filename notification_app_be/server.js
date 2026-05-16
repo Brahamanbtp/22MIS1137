@@ -6,15 +6,23 @@ const priorityRoutes = require('./routes/priorityRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const allowedOrigins = new Set([
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-]);
+function isAllowedDevOrigin(origin) {
+  if (!origin) {
+    return false;
+  }
+
+  try {
+    const parsedOrigin = new URL(origin);
+    return parsedOrigin.hostname === 'localhost' || parsedOrigin.hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (allowedOrigins.has(origin)) {
+  if (isAllowedDevOrigin(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
   }
@@ -31,7 +39,22 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use('/notifications', notificationRoutes);
+console.log('Notification route mounted');
 app.use('/priority', priorityRoutes);
+console.log('Priority route mounted');
+
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'backend running',
+  });
+});
+
+app.get('/test', (req, res) => {
+  res.json({
+    working: true,
+  });
+});
 
 app.use((req, res) => {
   res.status(404).json({
@@ -50,6 +73,7 @@ app.use((err, req, res, next) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Backend listening on port ${PORT}`);
+    console.log(app._router.stack);
   });
 }
 
