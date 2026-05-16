@@ -67,8 +67,6 @@ function buildQueryParams(page = 1, limit = 10, notificationType) {
 }
 
 function normalizeNotifications(response) {
-  console.log('RAW', response);
-
   const rawNotifications = Array.isArray(response?.notifications)
     ? response.notifications
     : Array.isArray(response?.data?.notifications)
@@ -83,8 +81,6 @@ function normalizeNotifications(response) {
     message: item?.Message || 'No message',
     timestamp: item?.Timestamp || null,
   }));
-
-  console.log('NORMALIZED', normalized);
 
   return normalized;
 }

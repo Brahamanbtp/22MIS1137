@@ -2,9 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const notificationRoutes = require('./routes/notificationRoutes');
 const priorityRoutes = require('./routes/priorityRoutes');
+const Log = require('./logging_middleware/log');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+function emitStartupLog(message) {
+  Log('backend', 'info', 'route', message).catch(() => {});
+}
 
 function isAllowedDevOrigin(origin) {
   if (!origin) {
@@ -39,9 +44,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 app.use('/notifications', notificationRoutes);
-console.log('Notification route mounted');
+emitStartupLog('Notification route mounted');
 app.use('/priority', priorityRoutes);
-console.log('Priority route mounted');
+emitStartupLog('Priority route mounted');
 
 app.get('/', (req, res) => {
   res.json({
@@ -72,8 +77,7 @@ app.use((err, req, res, next) => {
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Backend listening on port ${PORT}`);
-    console.log(app._router.stack);
+    emitStartupLog(`Backend listening on port ${PORT}`);
   });
 }
 
